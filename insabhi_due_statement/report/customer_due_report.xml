@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<template id="customer_report_due_statement">
+			<t t-call="web.html_container">
+			<t t-call="web.basic_layout">
+				<t t-set="doc" t-value="doc.with_context({'lang':doc.lang})" />
+				<t t-set="company" t-value="doc.env.company"/>
+				<div class="header row align-items-center" style="margin-bottom: 20px;">
+					<div class="col-auto">
+						<img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 130px; max-width: 250px; margin-top: 50px" alt="Logo"/>
+					</div>
+					<div class="col text-end">
+						<p style="margin: 0;">
+							<span t-esc="company.name" style="font-weight: bold; color: black;" /><br/>
+							<span t-esc="company.street" /><br/>
+							<span t-esc="company.street2" /><br/>
+							<span t-esc="company.city" />
+							<span t-esc="company.state_id.name" />
+							<span t-esc="company.zip" /><br/>
+							<span t-esc="company.country_id.name" /><br/>
+							<span><t t-esc="company.phone" /></span><br/>
+							<span><t t-esc="company.email" /></span><br/>
+
+						</p>
+					</div>
+				</div>
+
+
+				<div class="text-right" style="margin-right: 15em;">
+					<span>To</span>
+					<br/>
+					<p>
+						<span t-esc="doc.name"/><br/>
+						<span t-esc="doc.street" /><br/>
+						<span t-esc="doc.street2" /><br/>
+						<span t-esc="doc.city" />
+						<span t-esc="doc.state_id.name" />
+						<span t-esc="doc.zip" /><br/>
+						<span t-esc="doc.country_id.name" />
+					</p>
+					<br/>
+				</div>
+				<div class="page o_report_layout_standard">
+
+					<t t-if="doc.balance_invoice_ids.ids">
+						<div style="float: right; margin-bottom: 50px">
+							<div style="text-align: right;">
+								<h3 style="color: black">Statement of Accounts</h3>
+								<t t-if="doc.statement_from_date">
+									<hr/>
+									<span t-esc="doc.statement_from_date"/>
+								</t>
+								<t t-if="doc.statement_from_date and doc.statement_to_date">
+									<strong style="margin-left:10px; margin-right:10px">
+										<span>To</span></strong>
+								</t>
+								<t t-if="doc.statement_to_date">
+									<span t-esc="doc.statement_to_date"/>
+									<hr/>
+								</t>
+							</div>
+							<t t-set="due_total" t-value="0"/>
+								<t t-set="paid_total" t-value="0"/>
+								<t t-set="total" t-value="0"/>
+								<t t-foreach="doc.balance_invoice_ids" t-as="line">
+									<t t-if="line.result !=0 ">
+										<t t-set="due_total" t-value="due_total + line.amount_total_signed"/>
+										<t t-set="paid_total" t-value="paid_total + line.credit_amount"/>
+										<t t-set="total" t-value="total + line.result"/>
+									</t>
+								</t>
+							<div style="width: 400px">
+								<div style="background-color: #f2f2f2; padding: 6px"><h5 style="color: black;">Account Summery</h5></div>
+								<hr/>
+								<div style="display: flex; gap: 10px">
+									<span>Balance Due</span>
+									<span style="float:right;"><t t-esc="total"/></span>
+								</div>
+							</div>
+						</div>
+						<br/><br/>
+						<table class="table table-condensed" >
+							<thead>
+								<tr style="background-color: #f2f2f2;">
+									<th>Date</th>
+									<th>Ref</th>
+									<th>Details</th>
+									<th>Debit</th>
+									<th>Credit</th>
+									<th>Balance</th>
+								</tr>
+							</thead>
+							<t t-set="due_total" t-value="0"/>
+							<t t-set="paid_total" t-value="0"/>
+							<t t-set="total" t-value="0"/>
+							<tr t-foreach="doc.balance_invoice_ids" t-as="line">
+								<t t-if="line.result !=0 ">
+									<td>
+										<span t-esc="line.invoice_date"/>
+									</td>
+									<td>
+										<span t-esc="line.name"/>
+									</td>
+<!--									<td>-->
+<!--									   <span t-esc="line.name" />-->
+<!--									</td>-->
+									<td>
+										<!-- Conditional rendering for Details -->
+										<t t-if="'INV' in line.name">
+											<span>Goods/Services</span>
+										</t>
+										<t t-elif="'Credit Note' in line.name">
+											<span>Credit Note</span>
+										</t>
+										<t t-elif="'Debit Note' in line.name">
+											<span>Debit Note</span>
+										</t>
+										<t t-elif="'Payment' in line.name">
+											Payment
+										</t>
+										<t t-else="">
+
+										</t>
+									</td>
+
+									<td class="text-right">
+										<span t-esc="line.amount_total_signed" t-options="{'widget': 'monetary', 'display_currency': doc.env.company.currency_id}"/>
+									</td>
+									<td class="text-right">
+										<span t-esc="line.credit_amount" t-options="{'widget': 'monetary', 'display_currency': doc.env.company.currency_id}"/>
+									</td>
+									<td class="text-right">
+										<span t-esc="line.result" t-options="{'widget': 'monetary', 'display_currency': doc.env.company.currency_id}"/>
+									</td>
+									<t t-set="due_total" t-value="due_total + line.amount_total_signed"/>
+									<t t-set="paid_total" t-value="paid_total + line.credit_amount"/>
+									<t t-set="total" t-value="total + line.result"/>
+								</t>
+							</tr>
+<!--							<tr>-->
+<!--								<td colspan="3"></td>-->
+<!--								<td><strong>Balance :</strong></td>-->
+<!--								<td></td>-->
+<!--								<td class="text-right">-->
+<!--									<span t-esc="total" t-options="{'widget': 'monetary', 'display_currency': doc.env.company.currency_id}"/>-->
+<!--									<t t-set="due_total" t-value="total" />-->
+<!--								</td>-->
+<!--							</tr>-->
+						</table>
+					</t>
+				</div>
+				<br/>
+				<strong>Aging Summary (As of </strong>
+ 				<strong t-esc="datetime.datetime.now().strftime('%d-%m-%Y')" />)
+				<table t-attf-class="table table-sm" name="days_table">
+						<thead>
+							<tr >
+								<th style="text-align:left;background-color: #f2f2f2;">Period (in Days)</th>
+								<th>1-30</th>
+								<th>31-60</th>
+								<th>61-90</th>
+								<th>>90</th>
+								<th>Total</th>
+							</tr>
+						</thead>
+						<tr>
+							<td style="background-color: #f2f2f2;">Amount</td>
+							<td><span t-esc="doc.first_thirty_day" t-options="{'widget': 'monetary', 'display_currency': doc.env.company.currency_id}"/></td>
+							<td><span t-esc="doc.thirty_sixty_days" t-options="{'widget': 'monetary', 'display_currency': doc.env.company.currency_id}"/></td>
+							<td><span t-esc="doc.sixty_ninty_days" t-options="{'widget': 'monetary', 'display_currency': doc.env.company.currency_id}"/></td>
+							<td><span t-esc="doc.ninty_plus_days" t-options="{'widget': 'monetary', 'display_currency': doc.env.company.currency_id}"/></td>
+							<td><span t-esc="doc.total" t-options="{'widget': 'monetary', 'display_currency': doc.env.company.currency_id}"/></td>
+						</tr>
+					</table>
+
+			</t>
+			</t>
+		</template>
+
+		<template id="customer_report_due">
+			<t t-call="web.html_container">
+				<t t-foreach="docs" t-as="doc">
+					<t t-call="insabhi_due_statement.customer_report_due_statement" t-lang="doc.lang" />
+				</t>
+			</t>
+		</template>
+	</data>
+</odoo>
+
+
+

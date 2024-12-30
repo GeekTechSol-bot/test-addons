@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<!-- followup of customers views -->
+
+
+		<record id="account_invoice_extend_form" model="ir.ui.view">
+			<field name="name">account.move.extend.form</field>
+			<field name="model">account.move</field>
+			<field name="inherit_id" ref="account.view_move_form" />
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='amount_residual']" position="after">
+					<field name="credit_amount" invisible="1" />
+					<field name="result" invisible="1" />
+				</xpath>
+			</field>
+		</record>
+
+		<record id="account_invoice_extend_tree" model="ir.ui.view">
+			<field name="name">account.move.extend.tree</field>
+			<field name="model">account.move</field>
+			<field name="inherit_id" ref="account.view_invoice_tree" />
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='invoice_date_due']" position="after">
+					<field name="credit_amount" invisible="1" />
+					<field name="result" invisible="1" />
+				</xpath>
+			</field>
+		</record>
+
+    <record id="view_email_log_tree" model="ir.ui.view">
+        <field name="name">email.log.tree</field>
+        <field name="model">email.log</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="partner_id"/>
+                <field name="date_sent"/>
+                <field name="email_from"/>
+                <field name="email_to"/>
+                <field name="statement_type"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_email_log_form" model="ir.ui.view">
+        <field name="name">email.log.form</field>
+        <field name="model">email.log</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="date_sent"/>
+                        <field name="email_from"/>
+                        <field name="email_to"/>
+                        <field name="statement_type"/>
+                        <field name="status"/>
+                    </group>
+<!--                    <group>-->
+<!--                        <field name="report_ids" widget="many2many_tags"/>-->
+<!--                    </group>-->
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+
+    <record id="action_email_log" model="ir.actions.act_window">
+        <field name="name">Email Logs</field>
+        <field name="res_model">email.log</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_email_log_root" name="Email Logs" parent="base.menu_administration" action="action_email_log"/>
+<!--    <menuitem id="menu_email_log" name="Logs" action="action_email_log" sequence="10">-->
+
+
+
+	</data>
+</odoo>
